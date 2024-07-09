@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 public class CheckRunner {
-    static String discountCardNumber;
-    static float debitCardValue;
+
+    private static String discountCardNumber;
+    private static float debitCardValue;
 
     public static void main(String[] args) {
         try {
@@ -39,8 +40,8 @@ public class CheckRunner {
 //            System.out.println("Discount Amount: " + discountCard.getDiscountAmount());
 //
 //        }
-
-            CSVWriter.writeToCSV("src/main/resources/out.csv", ReceiptGenerator.generateReceipt(productsMap, debitCardValue, discountCardNumber));
+            ReceiptGenerator receiptGenerator = new ReceiptGenerator();
+            CSVWriter.writeToCSV("src/main/resources/out.csv", receiptGenerator.generateReceipt(productsMap, debitCardValue, discountCardNumber));
         } catch (IllegalArgumentException | NotEnoughMoneyException e) {
             CSVWriter.writeError(e.getMessage());
         } catch (Exception e) {

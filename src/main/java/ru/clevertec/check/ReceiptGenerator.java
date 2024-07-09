@@ -8,30 +8,30 @@ import java.util.Map;
 
 public class ReceiptGenerator {
 
-    static DecimalFormat priceDF = new DecimalFormat("0.00");
-    static DecimalFormat discountDF = new DecimalFormat("0.#");
-    private static float totalDiscount;
+    DecimalFormat priceDF = new DecimalFormat("0.00");
+    DecimalFormat discountDF = new DecimalFormat("0.#");
+    private float totalDiscount;
 
-    private static void addBlankSpace(List<String[]> receipt) {
+    private void addBlankSpace(List<String[]> receipt) {
         receipt.add(new String[]{""});
     }
 
-    private static void addDateTimeHeader(List<String[]> receipt) {
+    private void addDateTimeHeader(List<String[]> receipt) {
         receipt.add(new String[]{"Date", "Time"});
     }
 
-    private static void addDateTime(List<String[]> receipt) {
+    private void addDateTime(List<String[]> receipt) {
         receipt.add(new String[]{
                 DateTimeUtils.getDateTimeString().split(" ")[0],
                 DateTimeUtils.getDateTimeString().split(" ")[1]
         });
     }
 
-    private static void addProductInfoHeader(List<String[]> receipt) {
+    private void addProductInfoHeader(List<String[]> receipt) {
         receipt.add(new String[]{"QTY", "DESCRIPTION", "PRICE", "DISCOUNT", "TOTAL"});
     }
 
-    private static void addProductsInfo(List<String[]> receipt, Map<Integer, Integer> productsMap, String discountCardNumber) throws IOException {
+    private void addProductsInfo(List<String[]> receipt, Map<Integer, Integer> productsMap, String discountCardNumber) throws IOException {
         List<Product> allProducts = CSVReader.readProductsFromCSV("src/main/resources/products.csv");
         List<DiscountCard> allDiscountCards = CSVReader.readDiscountCardsFromCSV("src/main/resources/discountCards.csv");
 
@@ -58,19 +58,19 @@ public class ReceiptGenerator {
         }
     }
 
-    private static void addDiscountCardInfoHeader(List<String[]> receipt) {
+    private void addDiscountCardInfoHeader(List<String[]> receipt) {
         receipt.add(new String[]{"DISCOUNT CARD", "DISCOUNT PERCENTAGE"});
     }
 
-    private static void addDiscountCardInfo(List<String[]> receipt, String discountCardNumber) throws IOException {
+    private void addDiscountCardInfo(List<String[]> receipt, String discountCardNumber) throws IOException {
         receipt.add(new String[]{discountCardNumber, discountDF.format(DiscountCard.getDiscountCardDiscountAmountByDiscountCardNumber(discountCardNumber)) + "%"});
     }
 
-    private static void addOverallInfoHeader(List<String[]> receipt) {
+    private void addOverallInfoHeader(List<String[]> receipt) {
         receipt.add(new String[]{"TOTAL PRICE", "TOTAL DISCOUNT", "TOTAL WITH DISCOUNT"});
     }
 
-    private static void addOverallInfo(List<String[]> receipt, Map<Integer, Integer> productsMap) throws IOException {
+    private void addOverallInfo(List<String[]> receipt, Map<Integer, Integer> productsMap) throws IOException {
         float totalPrice = getReceiptTotalPrice(productsMap);
 
         receipt.add(new String[]{priceDF.format(totalPrice) + "$",
@@ -79,7 +79,7 @@ public class ReceiptGenerator {
         });
     }
 
-    public static float getProductTotalPrice(Map<Integer, Integer> productsMap, int productId) throws IOException {
+    public float getProductTotalPrice(Map<Integer, Integer> productsMap, int productId) throws IOException {
         float totalProductPrice = 0;
         List<Product> allProducts = CSVReader.readProductsFromCSV("src/main/resources/products.csv");
         for (Map.Entry<Integer, Integer> entry : productsMap.entrySet()) {
@@ -91,7 +91,7 @@ public class ReceiptGenerator {
         return totalProductPrice;
     }
 
-    private static float getReceiptTotalPrice(Map<Integer, Integer> productsMap) throws IOException {
+    private float getReceiptTotalPrice(Map<Integer, Integer> productsMap) throws IOException {
         float totalReceiptPrice = 0;
         List<Product> allProducts = CSVReader.readProductsFromCSV("src/main/resources/products.csv");
         for (Map.Entry<Integer, Integer> entry : productsMap.entrySet()) {
@@ -102,7 +102,7 @@ public class ReceiptGenerator {
         return totalReceiptPrice;
     }
 
-    private static boolean checkProductsAvailability(Map<Integer, Integer> productsMap) throws IOException {
+    private boolean checkProductsAvailability(Map<Integer, Integer> productsMap) throws IOException {
         List<Product> allProducts = CSVReader.readProductsFromCSV("src/main/resources/products.csv");
         try {
             for (Map.Entry<Integer, Integer> entry : productsMap.entrySet()) {
@@ -113,19 +113,20 @@ public class ReceiptGenerator {
         }
         return true;
     }
-    private void validate() {
 
-    }
-    public static List<String[]> generateReceipt(Map<Integer, Integer> productsMap, float debitCardValue, String discountCardNumber) throws IOException {
-        totalDiscount = 0;
-        List<String[]> receipt = new ArrayList<>();
+    private void validate(Map<Integer, Integer> productsMap, float debitCardValue) throws IOException {
         if (!checkProductsAvailability(productsMap)) {
             throw new IllegalArgumentException("BAD REQUEST");
         }
         if (getReceiptTotalPrice(productsMap) > debitCardValue) {
             throw new NotEnoughMoneyException("NOT ENOUGH MONEY");
         }
+    }
 
+    public List<String[]> generateReceipt(Map<Integer, Integer> productsMap, float debitCardValue, String discountCardNumber) throws IOException {
+        totalDiscount = 0;
+        validate(productsMap, debitCardValue);
+        List<String[]> receipt = new ArrayList<>();
         addDateTimeHeader(receipt);
         addDateTime(receipt);
         addBlankSpace(receipt);

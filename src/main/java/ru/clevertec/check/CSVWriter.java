@@ -29,7 +29,7 @@ public class CSVWriter {
         List<String[]> error = new ArrayList<>();
         error.add(new String[]{"ERROR"});
         error.add(new String[]{message});
-        CSVWriter.writeToCSV("src/main/resources/out.csv", error);
+        writeToCSV("src/main/resources/out.csv", error);
     }
 
 }
