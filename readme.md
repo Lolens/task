@@ -13,6 +13,6 @@
     1111 is the discount card number
 
     balanceDebitCard=100
-    100 is the amount which must be higher than total receipt value
+    100 is the amount which must be higher than total receipt value otherwise program will throw an exception
 
-    All csv files that program uses and generates can be found in resources
+    All csv files that program uses and generates can be found in resources folder
