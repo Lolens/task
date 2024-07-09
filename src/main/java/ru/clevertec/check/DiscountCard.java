@@ -1,5 +1,6 @@
 package ru.clevertec.check;
 
+import java.io.IOException;
 import java.util.List;
 
 public class DiscountCard {
@@ -37,7 +38,7 @@ public class DiscountCard {
         this.discountAmount = discountAmount;
     }
 
-    public static float getDiscountCardDiscountAmountByDiscountCardNumber(String number) {
+    public static float getDiscountCardDiscountAmountByDiscountCardNumber(String number) throws IOException {
         List<DiscountCard> allDiscountCards = CSVReader.readDiscountCardsFromCSV("src/main/resources/discountCards.csv");
         DiscountCard discountCard = allDiscountCards.stream()
                 .filter(cardNumber -> number.equals(cardNumber.getNumber()))

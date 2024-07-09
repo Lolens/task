@@ -1,5 +1,6 @@
 package ru.clevertec.check;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class ReceiptGenerator {
         receipt.add(new String[]{"QTY", "DESCRIPTION", "PRICE", "DISCOUNT", "TOTAL"});
     }
 
-    private static void addProductsInfo(List<String[]> receipt, Map<Integer, Integer> productsMap, String discountCardNumber) {
+    private static void addProductsInfo(List<String[]> receipt, Map<Integer, Integer> productsMap, String discountCardNumber) throws IOException {
         List<Product> allProducts = CSVReader.readProductsFromCSV("src/main/resources/products.csv");
         List<DiscountCard> allDiscountCards = CSVReader.readDiscountCardsFromCSV("src/main/resources/discountCards.csv");
 
@@ -61,7 +62,7 @@ public class ReceiptGenerator {
         receipt.add(new String[]{"DISCOUNT CARD", "DISCOUNT PERCENTAGE"});
     }
 
-    private static void addDiscountCardInfo(List<String[]> receipt, String discountCardNumber) {
+    private static void addDiscountCardInfo(List<String[]> receipt, String discountCardNumber) throws IOException {
         receipt.add(new String[]{discountCardNumber, discountDF.format(DiscountCard.getDiscountCardDiscountAmountByDiscountCardNumber(discountCardNumber)) + "%"});
     }
 
@@ -69,7 +70,7 @@ public class ReceiptGenerator {
         receipt.add(new String[]{"TOTAL PRICE", "TOTAL DISCOUNT", "TOTAL WITH DISCOUNT"});
     }
 
-    private static void addOverallInfo(List<String[]> receipt, Map<Integer, Integer> productsMap) {
+    private static void addOverallInfo(List<String[]> receipt, Map<Integer, Integer> productsMap) throws IOException {
         float totalPrice = getReceiptTotalPrice(productsMap);
 
         receipt.add(new String[]{priceDF.format(totalPrice) + "$",
@@ -78,7 +79,7 @@ public class ReceiptGenerator {
         });
     }
 
-    public static float getProductTotalPrice(Map<Integer, Integer> productsMap, int productId) {
+    public static float getProductTotalPrice(Map<Integer, Integer> productsMap, int productId) throws IOException {
         float totalProductPrice = 0;
         List<Product> allProducts = CSVReader.readProductsFromCSV("src/main/resources/products.csv");
         for (Map.Entry<Integer, Integer> entry : productsMap.entrySet()) {
@@ -90,7 +91,7 @@ public class ReceiptGenerator {
         return totalProductPrice;
     }
 
-    private static float getReceiptTotalPrice(Map<Integer, Integer> productsMap) {
+    private static float getReceiptTotalPrice(Map<Integer, Integer> productsMap) throws IOException {
         float totalReceiptPrice = 0;
         List<Product> allProducts = CSVReader.readProductsFromCSV("src/main/resources/products.csv");
         for (Map.Entry<Integer, Integer> entry : productsMap.entrySet()) {
@@ -101,7 +102,7 @@ public class ReceiptGenerator {
         return totalReceiptPrice;
     }
 
-    private static boolean checkProductsAvailability(Map<Integer, Integer> productsMap) {
+    private static boolean checkProductsAvailability(Map<Integer, Integer> productsMap) throws IOException {
         List<Product> allProducts = CSVReader.readProductsFromCSV("src/main/resources/products.csv");
         try {
             for (Map.Entry<Integer, Integer> entry : productsMap.entrySet()) {
@@ -115,21 +116,16 @@ public class ReceiptGenerator {
     private void validate() {
 
     }
-    public static List<String[]> generateReceipt(Map<Integer, Integer> productsMap, float debitCardValue, String discountCardNumber) {
+    public static List<String[]> generateReceipt(Map<Integer, Integer> productsMap, float debitCardValue, String discountCardNumber) throws IOException {
         totalDiscount = 0;
         List<String[]> receipt = new ArrayList<>();
         if (!checkProductsAvailability(productsMap)) {
-            System.out.println("BAD REQUEST");
-            receipt.add(new String[]{"ERROR"});
-            receipt.add(new String[]{"BAD REQUEST"});
-            return receipt;
+            throw new IllegalArgumentException("BAD REQUEST");
         }
         if (getReceiptTotalPrice(productsMap) > debitCardValue) {
-            System.out.println("not enough money");
-            receipt.add(new String[]{"ERROR"});
-            receipt.add(new String[]{"NOT ENOUGH MONEY"});
-            return receipt;
+            throw new NotEnoughMoneyException("NOT ENOUGH MONEY");
         }
+
         addDateTimeHeader(receipt);
         addDateTime(receipt);
         addBlankSpace(receipt);

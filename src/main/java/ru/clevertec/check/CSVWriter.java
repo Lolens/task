@@ -3,6 +3,7 @@ package ru.clevertec.check;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CSVWriter {
@@ -21,6 +22,14 @@ public class CSVWriter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void writeError(String message) {
+        System.out.println(message);
+        List<String[]> error = new ArrayList<>();
+        error.add(new String[]{"ERROR"});
+        error.add(new String[]{message});
+        CSVWriter.writeToCSV("src/main/resources/out.csv", error);
     }
 
 }

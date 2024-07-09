@@ -1,5 +1,7 @@
 package ru.clevertec.check;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,14 +11,15 @@ public class CheckRunner {
     static float debitCardValue;
 
     public static void main(String[] args) {
-        Map<Integer, Integer> productsMap = new HashMap<>();
+        try {
+            Map<Integer, Integer> productsMap = new HashMap<>();
 
-        parseArguments(args, productsMap);
+            parseArguments(args, productsMap);
 
-        System.out.println("\nProducts Map:");
-        for (Map.Entry<Integer, Integer> entry : productsMap.entrySet()) {
-            System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
-        }
+            System.out.println("\nProducts Map:");
+            for (Map.Entry<Integer, Integer> entry : productsMap.entrySet()) {
+                System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
+            }
 
 //        System.out.println("All products");
 //        List<Product> products = CSVReader.readProductsFromCSV("src/main/resources/products.csv");
@@ -36,9 +39,15 @@ public class CheckRunner {
 //            System.out.println("Discount Amount: " + discountCard.getDiscountAmount());
 //
 //        }
-        CSVWriter.writeToCSV("src/main/resources/out.csv", ReceiptGenerator.generateReceipt(productsMap, debitCardValue, discountCardNumber));
 
+            CSVWriter.writeToCSV("src/main/resources/out.csv", ReceiptGenerator.generateReceipt(productsMap, debitCardValue, discountCardNumber));
+        } catch (IllegalArgumentException | NotEnoughMoneyException e) {
+            CSVWriter.writeError(e.getMessage());
+        } catch (Exception e) {
+            CSVWriter.writeError("INTERNAL SERVER ERROR");
+        }
     }
+
 
     // javac -sourcepath ./src/main/java/ru/clevertec/check/* -d src ./src/main/java/ru/clevertec/check/CheckRunner.java
     // java -cp src ./src/main/java/ru/clevertec/check/CheckRunner.java 3-1 2-5 5-1 discountCard=1111 balanceDebitCard=100
@@ -51,8 +60,6 @@ public class CheckRunner {
                     debitCardValue = Float.parseFloat(parts[1]);
                 } else if (key.equals("discountCard")) {
                     discountCardNumber = parts[1];
-                } else {
-                    System.out.printf("Invalid argument key: %s\n", key);
                 }
             } else {
                 String[] productParts = arg.split("-");
@@ -64,8 +71,6 @@ public class CheckRunner {
                     } else {
                         productsMap.put(productId, quantity);
                     }
-                } else {
-                    System.out.printf("Invalid argument: %s\n", arg);
                 }
             }
         }

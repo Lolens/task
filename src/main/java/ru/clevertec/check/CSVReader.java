@@ -1,13 +1,14 @@
 package ru.clevertec.check;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CSVReader {
-    public static List<Product> readProductsFromCSV(String csvFilePath) {
+    public static List<Product> readProductsFromCSV(String csvFilePath) throws IOException {
         List<Product> products = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
@@ -27,14 +28,11 @@ public class CSVReader {
                     products.add(product);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
         return products;
     }
 
-    public static List<DiscountCard> readDiscountCardsFromCSV(String csvFilePath) {
+    public static List<DiscountCard> readDiscountCardsFromCSV(String csvFilePath) throws IOException {
         List<DiscountCard> discountCards = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
@@ -53,10 +51,7 @@ public class CSVReader {
                     discountCards.add(discountCard);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
         return discountCards;
     }
 }
