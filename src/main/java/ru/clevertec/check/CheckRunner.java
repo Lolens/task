@@ -40,7 +40,7 @@ public class CheckRunner {
 //            System.out.println("Discount Amount: " + discountCard.getDiscountAmount());
 //
 //        }
-            ReceiptGenerator receiptGenerator = new ReceiptGenerator();
+            ReceiptGenerator receiptGenerator = new ReceiptGeneratorImpl();
             CSVWriter.writeToCSV("src/main/resources/out.csv", receiptGenerator.generateReceipt(productsMap, debitCardValue, discountCardNumber));
         } catch (IllegalArgumentException | NotEnoughMoneyException e) {
             CSVWriter.writeError(e.getMessage());
