@@ -34,5 +34,5 @@ public interface ReceiptGenerator {
 
     void validate(Map<Integer, Integer> productsMap, float debitCardValue) throws IOException;
 
-    List<String[]> generateReceipt(Map<Integer, Integer> productsMap, float debitCardValue, String discountCardNumber) throws IOException;
+    List<String[]> generateReceipt(Map<Integer, Integer> productsMap, float debitCardValue, String discountCardNumber, String pathToFile) throws IOException;
 }

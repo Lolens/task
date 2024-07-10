@@ -24,12 +24,15 @@ public class CSVWriter {
         }
     }
 
-    public static void writeError(String message) {
+    public static void writeError(String message, String csvFilePath) {
         System.out.println(message);
+        if (csvFilePath == null) {
+            csvFilePath = "src/main/resources/result.csv";
+        }
         List<String[]> error = new ArrayList<>();
         error.add(new String[]{"ERROR"});
         error.add(new String[]{message});
-        writeToCSV("src/main/resources/out.csv", error);
+        writeToCSV(csvFilePath, error);
     }
 
 }

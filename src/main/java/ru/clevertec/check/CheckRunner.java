@@ -10,6 +10,8 @@ public class CheckRunner {
 
     private static String discountCardNumber;
     private static float debitCardValue;
+    private static String pathToFile = null;
+    private static String saveToFile = null;
 
     public static void main(String[] args) {
         try {
@@ -41,11 +43,12 @@ public class CheckRunner {
 //
 //        }
             ReceiptGenerator receiptGenerator = new ReceiptGeneratorImpl();
-            CSVWriter.writeToCSV("src/main/resources/out.csv", receiptGenerator.generateReceipt(productsMap, debitCardValue, discountCardNumber));
+            if (pathToFile == null || saveToFile == null) throw new IllegalArgumentException("BAD REQUEST");
+            CSVWriter.writeToCSV(saveToFile, receiptGenerator.generateReceipt(productsMap, debitCardValue, discountCardNumber, pathToFile));
         } catch (IllegalArgumentException | NotEnoughMoneyException e) {
-            CSVWriter.writeError(e.getMessage());
+            CSVWriter.writeError(e.getMessage(), saveToFile);
         } catch (Exception e) {
-            CSVWriter.writeError("INTERNAL SERVER ERROR");
+            CSVWriter.writeError("INTERNAL SERVER ERROR", saveToFile);
         }
     }
 
@@ -57,10 +60,15 @@ public class CheckRunner {
             String[] parts = arg.split("=");
             if (parts.length == 2) {
                 String key = parts[0];
+                String value = parts[1];
                 if (key.equals("balanceDebitCard")) {
-                    debitCardValue = Float.parseFloat(parts[1]);
+                    debitCardValue = Float.parseFloat(value);
                 } else if (key.equals("discountCard")) {
-                    discountCardNumber = parts[1];
+                    discountCardNumber = value;
+                } else if (key.equals("pathToFile")) {
+                    pathToFile = value;
+                } else if (key.equals("saveToFile")) {
+                    saveToFile = value;
                 }
             } else {
                 String[] productParts = arg.split("-");

@@ -9,6 +9,8 @@ import java.util.Map;
 public class ReceiptGeneratorImpl implements ReceiptGenerator {
     DecimalFormat PRICE_DF = new DecimalFormat("0.00");
     DecimalFormat DISCOUNT_DF = new DecimalFormat("0.#");
+    String pathToProductsFile;
+    String pathToDiscountCardsFile = "src/main/resources/discountCards.csv";
     private float totalDiscount;
 
     @Override
@@ -36,9 +38,8 @@ public class ReceiptGeneratorImpl implements ReceiptGenerator {
 
     @Override
     public void addProductsInfo(List<String[]> receipt, Map<Integer, Integer> productsMap, String discountCardNumber) throws IOException {
-        List<Product> allProducts = CSVReader.readProductsFromCSV("src/main/resources/products.csv");
-        List<DiscountCard> allDiscountCards = CSVReader.readDiscountCardsFromCSV("src/main/resources/discountCards.csv");
-
+        List<Product> allProducts = CSVReader.readProductsFromCSV(pathToProductsFile);
+        List<DiscountCard> allDiscountCards = CSVReader.readDiscountCardsFromCSV(pathToDiscountCardsFile);
         float discount = 0;
 
         for (Map.Entry<Integer, Integer> entry : productsMap.entrySet()) {
@@ -90,7 +91,7 @@ public class ReceiptGeneratorImpl implements ReceiptGenerator {
     @Override
     public float getProductTotalPrice(Map<Integer, Integer> productsMap, int productId) throws IOException {
         float totalProductPrice = 0;
-        List<Product> allProducts = CSVReader.readProductsFromCSV("src/main/resources/products.csv");
+        List<Product> allProducts = CSVReader.readProductsFromCSV(pathToProductsFile);
         for (Map.Entry<Integer, Integer> entry : productsMap.entrySet()) {
             if (productId == entry.getKey()) {
                 Product product = allProducts.get(entry.getKey() - 1);
@@ -103,7 +104,7 @@ public class ReceiptGeneratorImpl implements ReceiptGenerator {
     @Override
     public float getReceiptTotalPrice(Map<Integer, Integer> productsMap) throws IOException {
         float totalReceiptPrice = 0;
-        List<Product> allProducts = CSVReader.readProductsFromCSV("src/main/resources/products.csv");
+        List<Product> allProducts = CSVReader.readProductsFromCSV(pathToProductsFile);
         for (Map.Entry<Integer, Integer> entry : productsMap.entrySet()) {
             Product product = allProducts.get(entry.getKey() - 1);
 
@@ -114,7 +115,7 @@ public class ReceiptGeneratorImpl implements ReceiptGenerator {
 
     @Override
     public boolean checkProductsAvailability(Map<Integer, Integer> productsMap) throws IOException {
-        List<Product> allProducts = CSVReader.readProductsFromCSV("src/main/resources/products.csv");
+        List<Product> allProducts = CSVReader.readProductsFromCSV(pathToProductsFile);
         try {
             for (Map.Entry<Integer, Integer> entry : productsMap.entrySet()) {
                 allProducts.get(entry.getKey() - 1);
@@ -136,7 +137,8 @@ public class ReceiptGeneratorImpl implements ReceiptGenerator {
     }
 
     @Override
-    public List<String[]> generateReceipt(Map<Integer, Integer> productsMap, float debitCardValue, String discountCardNumber) throws IOException {
+    public List<String[]> generateReceipt(Map<Integer, Integer> productsMap, float debitCardValue, String discountCardNumber, String pathToFile) throws IOException {
+        pathToProductsFile = pathToFile;
         totalDiscount = 0;
         validate(productsMap, debitCardValue);
         List<String[]> receipt = new ArrayList<>();
