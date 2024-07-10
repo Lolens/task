@@ -2,7 +2,7 @@
     javac -sourcepath ./src/main/java/ru/clevertec/check/* -d src ./src/main/java/ru/clevertec/check/CheckRunner.java
 
     Arguments to start
-    java -cp src ./src/main/java/ru/clevertec/check/CheckRunner.java 3-1 2-5 5-1 discountCard=1111 balanceDebitCard=100
+    java -cp src ./src/main/java/ru/clevertec/check/CheckRunner.java 3-1 2-5 5-1 discountCard=1111 balanceDebitCard=100 pathToFile=src/main/resources/products saveToFile=src/main/resources/out.csv
   
     "3-1 2-5 5-1" 
     3 for product id
